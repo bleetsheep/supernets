@@ -15,25 +15,53 @@ supernets works with both IPv4 and IPv6 addresses.<br>
 
 
 This is implemented in Python and is intended to be run from the command line.<br>
-It is writtent to be compatible with both Python 2.6+ and Python 3+.<br>
-This is accomplished by using future imports.<br>
+It is written to be compatible with both Python 2.6+ and Python 3+,<br>
+using only standard libraries and future imports.<br>
 Additionally, the ipaddress module expects unicode input.<br>
 This presented a challenge: <br>
 Python 3 defaults to unicode, so the code needed no modification to work.<br>
-Python 2 defaults to a non-unicode string type, requiring a .decode() method.<br>
+Python 2 defaults to a non-unicode string type, requiring a `.decode()` method.<br>
 This method breaks Python 3 since it is already decoded.<br>
 The solution is to encode to bytes and then decode to unicode.<br>
-    line = line.strip().encode().decode()  # Python 2/3 dual support.<br>
 
-Another intersting trick was to get the final output sorted.<br>
+    line = line.strip().encode().decode()  # Python 2/3 dual support.
+
+Another interesting trick was to get the final output sorted.<br>
 The problem is that IPv4 and IPv6 networks are of different types<br>
 that cannot be directly compared, so I needed to create a lambda<br>
 function to get the network address and represent it in byte format,<br>
 allowing the two IP address formats to be directly comparable.<br>
-    for network in sorted(networks, key=lambda ip: ip.network_address.packed):<br>
+
+    for network in sorted(networks, key=lambda ip: ip.network_address.packed):
 
 
-Program Logic - This is how we do:<br>
+##### Example: #####
+
+```
+$ #Example file:
+$ cat ips.txt
+10.0.3.2
+10.0.1.6
+10.0.1.1
+10.0.1.3
+10.0.1.0
+10.0.2.3
+10.0.2.1
+10.0.1.2
+10.0.2.2
+10.0.1.7
+10.0.2.0
+10.0.1.4
+10.0.1.5
+
+$ #Create supernets out of these IP addresses:
+$ python3 supernets.py ips.txt
+10.0.1.0/29
+10.0.2.0/30
+10.0.3.2/32
+```
+
+##### Program Logic - This is how it works: #####
 
 A global networks dictionary is created and all networks are added to it.<br>
 Using a dictionary prevents duplicate networks.<br>
